@@ -12,6 +12,10 @@ class Passenger;
 class AdminPanel;
 class Date;
 
+void seed()
+{
+    srand(time(0));
+}
 AdminPanel adminPanel;
 class User
 {
@@ -43,14 +47,40 @@ private:
     string email;
     string phone;
     vector<Ticket> myTickets;
+    vector<int> Tickets; // to save & retrive Ticket objects from file
 
 public:
     Passenger(string uname = "", string pass = "", string name = "", string email = "", string phone = "")
         : UserGuest(uname, pass), fullName(name), email(email), phone(phone) {}
+
     string getUsername() { return username; }
+    string getFullName() { return fullName; }
+    string getEmail() { return email; }
+    string getPhone() { return phone; }
+    string getMyTickets()
+    {
+        string ticketsList = "";
+        for (auto &ticket : myTickets)
+        {
+            ticketsList += to_string(ticket.getTicketNo()) + " ";
+        }
+        return ticketsList;
+    }
+    vector<int> &getMyTicketsvec()
+    {
+        return Tickets;
+    }
+    void addMyTicket(int ticketNo)
+    {
+        Tickets.push_back(ticketNo);
+    }
     void bookTicket(Station &from, Station &to, TravelClass &travelClass, Date &date);
     void cancelTicket();
     void viewMyTickets();
+    void addTicketObject(Ticket &t)
+    {
+        myTickets.push_back(t);
+    }
     ~Passenger() {}
 };
 
@@ -71,15 +101,28 @@ public:
 class TravelClass
 {
 private:
+    int classId;
     string className; // e.g., "AC", "Sleeper"
     int totalSeats;
     int bookedSeats;
     float fare;
+    map<string, int> classIds = {
+        {"AC", 1},
+        {"Sleeper", 2},
+        {"General", 3},
+        {"First Class", 4},
+        {"Second Class", 5},
+        {"Third Class", 6}};
 
 public:
-    TravelClass(string name = "", int total = 0, int booked = 0, float fare = 0.0) : className(name), totalSeats(total), bookedSeats(booked), fare(fare) {}
+    TravelClass(int id = 0, string name = "", int total = 0, int booked = 0, float fare = 0.0) : classId(id), className(name), totalSeats(total), bookedSeats(booked), fare(fare)
+    {
+        id = classIds[name];
+    }
 
     string getClassName();
+    int getId() { return classId; }
+    int getTotalSeats() { return totalSeats; }
     int getAvailableSeats();
     int getBookedSeats();
     int getSeatNumber() {};
@@ -96,6 +139,7 @@ private:
     string name;
     vector<int> route;
     vector<TravelClass> classes;
+    vector<int> classId; // to save & retrieve TravelClass objects from file
 
 public:
     Train(int id = 0, string name = "") : trainId(id), name(name) {}
@@ -103,10 +147,42 @@ public:
     string getName();
     float getFare(string &className);
     vector<int> getRoute();
-    vector<TravelClass> getClasses();
+    vector<TravelClass> &getClasses();
     void setroute(vector<int> &newRoute);
     void addClass(TravelClass &newClass);
-
+    string getroutestr()
+    {
+        string routeStr = "";
+        for (auto &&stationId : route)
+        {
+            routeStr += to_string(stationId) + " ";
+        }
+        return routeStr;
+    }
+    void addroute(int stationId)
+    {
+        route.push_back(stationId);
+    }
+    void addclassid(int classId){
+        this->classId.push_back(classId);
+    }
+    string getClassesStr()
+    {
+        string classesStr = "";
+        for (auto &&travelClass : classes)
+        {
+            classesStr += travelClass.getClassName() + " ";
+        }
+        return classesStr;
+    }
+    void addClassObject(TravelClass &c)
+    {
+        classes.push_back(c);
+    }
+    vector<int> getClassIds()
+    {
+        return classId;
+    }
     void viewTrain();
 };
 
@@ -115,29 +191,134 @@ class Ticket
     int ticketNo;
     string pnr;
     Passenger &passenger;
+    string passangerUsername; // to save & retrieve Passenger objects from file
     Train &train;
+    int trainId; // this also
     Station &origin;
+    int originId; // this also
     Station &destination;
+    int destinationId; // this also
     int seatNumber;
     float fare;
     TravelClass &travelClass;
-    Date &date;
+    int travelClassId; // this also
+    Date date;
+    int day, month, year; // this also
 
 public:
     Ticket(int ticketNo, string &pnr, Passenger &passenger, Train &train, Station &origin,
-           Station &destination, int seatNumber, float fare, TravelClass &travelClass, Date &date)
+           Station &destination, int seatNumber, float fare, TravelClass &travelClass, Date date)
         : ticketNo(ticketNo), pnr(pnr), passenger(passenger), train(train), origin(origin), destination(destination),
-          seatNumber(seatNumber), fare(fare), travelClass(travelClass), date(date) {}
+          seatNumber(seatNumber), fare(fare), travelClass(travelClass), date(date)
+    {
+        passangerUsername = passenger.getUsername();
+        trainId = train.getId();
+        originId = origin.getId();
+        destinationId = destination.getId();
+        travelClassId = travelClass.getId();
+        day = date.getday();
+        month = date.getmonth();
+        year = date.getyear();
+    }
     int getTicketNo();
     string getPNR();
     int getSeatNumber();
     Train &getTrain();
     Station &getOrigin();
     Station &getDestination();
-    Date &getDate();
+    Date getDate();
     float getFare();
     TravelClass &getTravelClass();
+    string getUserNameFromObj()
+    {
+        return passenger.getUsername();
+    }
+    int gettrainIdfromObj()
+    {
+        return train.getId();
+    }
+    int getoriginIdfromObj()
+    {
+        return origin.getId();
+    }
+    int getdestinationIdfromObj()
+    {
+        return destination.getId();
+    }
+    int gettravelClassIdfromObj()
+    {
+        return travelClass.getId();
+    }
+    int getdayfromObj()
+    {
+        return date.getday();
+    }
+    int getmonthFromObj()
+    {
+        return date.getmonth();
+    }
+    int getyearFromObj()
+    {
+        return date.getyear();
+    }
 
+    string getUserName()
+    {
+        return passangerUsername;
+    }
+    int getTrainId()
+    {
+        return trainId;
+    }
+    int getOriginId()
+    {
+        return originId;
+    }
+    int getDestinationId()
+    {
+        return destinationId;
+    }
+    int getTravelClassId()
+    {
+        return travelClassId;
+    }
+    int getday()
+    {
+        return day;
+    }
+    int getmonth()
+    {
+        return month;
+    }
+    int getyear()
+    {
+        return year;
+    }
+
+    void setPassenger(Passenger &newPassenger)
+    {
+        passenger = newPassenger;
+    }
+    void setTrain(Train &newTrain)
+    {
+        train = newTrain;
+    }
+    void setOrigin(Station &newOrigin)
+    {
+        origin = newOrigin;
+    }
+    void setDestination(Station &newDestination)
+    {
+        destination = newDestination;
+    }
+    void setTravelClass(TravelClass &newTravelClass)
+    {
+        travelClass = newTravelClass;
+    }
+    void setDate(Date &newDate)
+    {
+        date = newDate;
+    }
     void printTicket();
     void viewTicket();
     ~Ticket() {}
@@ -150,6 +331,7 @@ class AdminPanel
 
 public:
     AdminPanel() {}
+    AdminPanel(vector<Train> &trains, vector<Station> &stations) : trains(trains), stations(stations) {}
     int generateTicketNo();
     string generatePNR();
 
@@ -188,6 +370,9 @@ public:
     Date(int day = 0, int month = 0, int year = 0) : day(day), month(month), year(year) {}
     int Calculate_days(Date Start_date, Date End_date);
     string show_date();
+    int getday() { return day; }
+    int getmonth() { return month; }
+    int getyear() { return year; }
 };
 
 bool User::login(string uname, string pass)
@@ -223,7 +408,9 @@ vector<Train *> UserGuest::viewAvailability(string &from, string &to, Date &date
     }
     vector<Train *> trains = adminPanel.getTrains();
     Date travelDate;
-    vector<Train *> availableTrains;
+    // vector<Train *> availableTrains;
+    set<Train *> availableTrains;
+
     for (auto &&train : trains)
     {
         vector<int> route = train->getRoute();
@@ -242,22 +429,18 @@ vector<Train *> UserGuest::viewAvailability(string &from, string &to, Date &date
             vector<TravelClass> classes = train->getClasses();
             for (auto &&travelclass : classes)
             {
-                bool flag = false;
                 if (travelclass.getAvailableSeats() > 0)
                 {
                     cout << availableTrains.size() + 1 << ". Train ID: " << train->getId() << ", Name: " << train->getName() << endl;
                     cout << "Available Classes: " << endl;
                     cout << travelclass.getClassName() << " - Available Seats: " << travelclass.getAvailableSeats() << ", Fare: " << travelclass.getFare() << endl;
-                    if (!flag)
-                    {
-                        availableTrains.push_back(train);
-                        flag = true;
-                    }
+                    availableTrains.insert(train);
                 }
             }
         }
     }
-    return availableTrains;
+    vector<Train *> availableTrainsVec(availableTrains.begin(), availableTrains.end());
+    return availableTrainsVec;
 }
 
 void UserGuest::logout()
@@ -304,6 +487,7 @@ void Passenger ::bookTicket(Station &from, Station &to, TravelClass &travelClass
         travelClass,
         date);
     myTickets.push_back(newTicket);
+    Tickets.push_back(ticketNo);
     cout << "Ticket booked successfully!" << endl;
     cout << "Ticket No: " << ticketNo << ", PNR: " << pnr << endl;
     newTicket.printTicket();
@@ -414,7 +598,7 @@ vector<int> Train::getRoute()
     return route;
 }
 
-vector<TravelClass> Train::getClasses()
+vector<TravelClass> &Train::getClasses()
 {
     return classes;
 }
@@ -425,6 +609,7 @@ void Train ::setroute(vector<int> &newRoute)
 void Train::addClass(TravelClass &newClass)
 {
     classes.push_back(newClass);
+    classId.push_back(newClass.getId());
 }
 void Train::viewTrain()
 {
@@ -469,7 +654,7 @@ Station &Ticket::getDestination()
 {
     return destination;
 }
-Date &Ticket::getDate()
+Date Ticket::getDate()
 {
     return date;
 }
@@ -559,7 +744,7 @@ void AdminPanel::addTrain()
         float fare;
         cout << "Enter Fare: ";
         cin >> fare;
-        TravelClass newClass(className, totalSeats, 0, fare);
+        TravelClass newClass(0, className, totalSeats, 0, fare);
         newTrain.addClass(newClass);
     }
     cout << "Train added successfully!" << endl;
@@ -662,13 +847,14 @@ void AdminPanel ::updateTrainFare(int trainId, string &className, float newFare)
     {
         if (train.getId() == trainId)
         {
-            vector<TravelClass> classes = train.getClasses();
+            vector<TravelClass> &classes = train.getClasses();
             for (auto &&travelClass : classes)
             {
                 if (travelClass.getClassName() == className)
                 {
                     travelClass.setFare(newFare);
                     cout << "Fare updated successfully!" << endl;
+
                     return;
                 }
             }
@@ -676,6 +862,7 @@ void AdminPanel ::updateTrainFare(int trainId, string &className, float newFare)
             return;
         }
     }
+
     cout << "Train not found." << endl;
 }
 
@@ -685,7 +872,7 @@ void AdminPanel ::updateTrainSeats(int trainId, string &className, int newTotalS
     {
         if (train.getId() == trainId)
         {
-            vector<TravelClass> classes = train.getClasses();
+            vector<TravelClass> &classes = train.getClasses();
             for (auto &&travelClass : classes)
             {
                 if (travelClass.getClassName() == className)
@@ -709,6 +896,8 @@ int Date ::Calculate_days(Date Start_date, Date End_date)
     int day1 = Start_date.day, day2 = End_date.day;
     int month1 = Start_date.month, month2 = End_date.month;
     int year1 = Start_date.year, year2 = End_date.year;
+    if ((year1 % 4 == 0 && year1 % 100 != 0) || (year1 % 400 == 0))
+        days_in_month[1] = 29;
     if (year1 > year2 || (year1 == year2 && month1 > month2) || (year1 == year2 && month1 == month2 && day1 > day2))
     {
         cout << "Invalid date range." << endl;
