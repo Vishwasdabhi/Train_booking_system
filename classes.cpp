@@ -163,7 +163,8 @@ public:
     {
         route.push_back(stationId);
     }
-    void addclassid(int classId){
+    void addclassid(int classId)
+    {
         this->classId.push_back(classId);
     }
     string getClassesStr()
@@ -190,35 +191,43 @@ class Ticket
 {
     int ticketNo;
     string pnr;
-    Passenger &passenger;
+    Passenger *passenger;
     string passangerUsername; // to save & retrieve Passenger objects from file
-    Train &train;
+    Train *train;
     int trainId; // this also
-    Station &origin;
+    Station *origin;
     int originId; // this also
-    Station &destination;
+    Station *destination;
     int destinationId; // this also
     int seatNumber;
     float fare;
-    TravelClass &travelClass;
+    TravelClass *travelClass;
     int travelClassId; // this also
     Date date;
     int day, month, year; // this also
 
 public:
-    Ticket(int ticketNo, string &pnr, Passenger &passenger, Train &train, Station &origin,
-           Station &destination, int seatNumber, float fare, TravelClass &travelClass, Date date)
+    Ticket(int ticketNo = 0, string pnr = "", Passenger *passenger = nullptr, Train *train = nullptr, Station *origin = nullptr, Station *destination = nullptr, int seatNumber = 0, float fare = 0.0, TravelClass *travelClass = nullptr, Date date = Date())
         : ticketNo(ticketNo), pnr(pnr), passenger(passenger), train(train), origin(origin), destination(destination),
           seatNumber(seatNumber), fare(fare), travelClass(travelClass), date(date)
     {
-        passangerUsername = passenger.getUsername();
-        trainId = train.getId();
-        originId = origin.getId();
-        destinationId = destination.getId();
-        travelClassId = travelClass.getId();
+        passangerUsername = passenger->getUsername();
+        trainId = train->getId();
+        originId = origin->getId();
+        destinationId = destination->getId();
+        travelClassId = travelClass->getId();
         day = date.getday();
         month = date.getmonth();
         year = date.getyear();
+    }
+    Ticket(int ticketNo = 0, string pnr = "", string passengerusername = "", int trainId = 0, int originId = 0, int destinationId = 0, int seatNumber = 0, float fare = 0, int travelClassId = 0, int day = 0, int month = 0, int year = 0) : ticketNo(ticketNo), pnr(pnr), passangerUsername(passengerusername), seatNumber(seatNumber), fare(fare), trainId(trainId), originId(originId), destinationId(destinationId), travelClassId(travelClassId), day(day), month(month), year(year)
+    {
+        date = Date(day, month, year);
+        passenger = nullptr;
+        train = nullptr;
+        origin = nullptr;
+        destination = nullptr;
+        travelClass = nullptr;
     }
     int getTicketNo();
     string getPNR();
@@ -231,23 +240,23 @@ public:
     TravelClass &getTravelClass();
     string getUserNameFromObj()
     {
-        return passenger.getUsername();
+        return passenger->getUsername();
     }
     int gettrainIdfromObj()
     {
-        return train.getId();
+        return train->getId();
     }
     int getoriginIdfromObj()
     {
-        return origin.getId();
+        return origin->getId();
     }
     int getdestinationIdfromObj()
     {
-        return destination.getId();
+        return destination->getId();
     }
     int gettravelClassIdfromObj()
     {
-        return travelClass.getId();
+        return travelClass->getId();
     }
     int getdayfromObj()
     {
@@ -295,23 +304,23 @@ public:
         return year;
     }
 
-    void setPassenger(Passenger &newPassenger)
+    void setPassenger(Passenger *newPassenger)
     {
         passenger = newPassenger;
     }
-    void setTrain(Train &newTrain)
+    void setTrain(Train *newTrain)
     {
         train = newTrain;
     }
-    void setOrigin(Station &newOrigin)
+    void setOrigin(Station *newOrigin)
     {
         origin = newOrigin;
     }
-    void setDestination(Station &newDestination)
+    void setDestination(Station *newDestination)
     {
         destination = newDestination;
     }
-    void setTravelClass(TravelClass &newTravelClass)
+    void setTravelClass(TravelClass *newTravelClass)
     {
         travelClass = newTravelClass;
     }
@@ -475,17 +484,7 @@ void Passenger ::bookTicket(Station &from, Station &to, TravelClass &travelClass
         return;
     }
     string pnr = adminPanel.generatePNR();
-    Ticket newTicket(
-        ticketNo,
-        pnr,
-        *this,
-        *selectedTrain,
-        from,
-        to,
-        travelClass.getAvailableSeats() - travelClass.getBookedSeats() + 1,
-        travelClass.getFare(),
-        travelClass,
-        date);
+    Ticket newTicket(ticketNo, pnr, this, selectedTrain, &from, &to, travelClass.getAvailableSeats() - travelClass.getBookedSeats() + 1, travelClass.getFare(), &travelClass, date);
     myTickets.push_back(newTicket);
     Tickets.push_back(ticketNo);
     cout << "Ticket booked successfully!" << endl;
@@ -644,15 +643,15 @@ int Ticket ::getSeatNumber()
 
 Train &Ticket::getTrain()
 {
-    return train;
+    return *train;
 }
 Station &Ticket::getOrigin()
 {
-    return origin;
+    return *origin;
 }
 Station &Ticket::getDestination()
 {
-    return destination;
+    return *destination;
 }
 Date Ticket::getDate()
 {
@@ -664,7 +663,7 @@ float Ticket::getFare()
 }
 TravelClass &Ticket::getTravelClass()
 {
-    return travelClass;
+    return *travelClass;
 }
 void Ticket::printTicket()
 {
@@ -675,11 +674,11 @@ void Ticket ::viewTicket()
 {
     cout << "Ticket No: " << ticketNo << endl;
     cout << "PNR: " << pnr << endl;
-    cout << "Passenger: " << passenger.getUsername() << endl;
-    cout << "Train: " << train.getName() << endl;
-    cout << "From: " << origin.getName() << " To: " << destination.getName() << endl;
+    cout << "Passenger: " << passenger->getUsername() << endl;
+    cout << "Train: " << train->getName() << endl;
+    cout << "From: " << origin->getName() << " To: " << destination->getName() << endl;
     cout << "Date: " << date.show_date() << endl;
-    cout << "Travel Class: " << travelClass.getClassName() << endl;
+    cout << "Travel Class: " << travelClass->getClassName() << endl;
     cout << "Seat Number: " << seatNumber << endl;
     cout << "Fare: " << fare << endl;
 }

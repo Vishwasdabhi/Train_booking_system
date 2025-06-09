@@ -287,23 +287,23 @@ void loadDataFromFile()
     {
         if (passengerMap.count(ticket.getUserName()))
         {
-            ticket.setPassenger(*(passengerMap[ticket.getUserName()]));
+            ticket.setPassenger((passengerMap[ticket.getUserName()]));
         }
         if (trainMap.count(ticket.getTrainId()))
         {
-            ticket.setTrain(*(trainMap[ticket.getTrainId()]));
+            ticket.setTrain((trainMap[ticket.getTrainId()]));
         }
         if (stationMap.count(ticket.getOriginId()))
         {
-            ticket.setOrigin(*(stationMap[ticket.getOriginId()]));
+            ticket.setOrigin((stationMap[ticket.getOriginId()]));
         }
         if (stationMap.count(ticket.getDestinationId()))
         {
-            ticket.setDestination(*(stationMap[ticket.getDestinationId()]));
+            ticket.setDestination((stationMap[ticket.getDestinationId()]));
         }
         if (travelClassMap.count(ticket.getTravelClassId()))
         {
-            ticket.setTravelClass(*(travelClassMap[ticket.getTravelClassId()]));
+            ticket.setTravelClass((travelClassMap[ticket.getTravelClassId()]));
         }
         int day = ticket.getday(), month = ticket.getmonth(), year = ticket.getyear();
         Date date(day, month, year);
