@@ -70,7 +70,7 @@ void saveDataToFile()
     }
     for (auto &ticket : *tickets)
     {
-        tickets_file << ticket.getTicketNo() << "," << ticket.getPNR() << "," << ticket.getUserName() << ","
+        tickets_file << ticket.getTicketNo() << "," << ticket.getPNR() << "," << ticket.getpassengerUserName() << ","
                      << ticket.gettrainIdfromObj() << "," << ticket.getoriginIdfromObj() << "," << ticket.getdestinationIdfromObj() << ","
                      << ticket.getSeatNumber() << "," << ticket.getFare() << "," << ticket.gettravelClassIdfromObj() << ","
                      << ticket.getday() << "," << ticket.getmonth() << "," << ticket.getyear() << endl;
@@ -207,12 +207,13 @@ void loadDataFromFile()
     while (getline(tickets_file, line))
     {
         stringstream ss(line);
-        int ticketNo, passengerId, trainId, originId, destinationId, seatNumber, travelClassId, day, month, year;
+        int ticketNo, trainId, originId, destinationId, seatNumber, travelClassId, day, month, year;
         string pnr;
+        string passengerusername;
         ss >> ticketNo;
         ss.ignore(1); // Ignore the comma
         getline(ss, pnr, ',');
-        ss >> passengerId;
+        ss >> passengerusername;
         ss.ignore(1); // Ignore the comma
         ss >> trainId;
         ss.ignore(1); // Ignore the comma
@@ -233,7 +234,7 @@ void loadDataFromFile()
         ss.ignore(1); // Ignore the comma
         ss >> year;
 
-        tickets->emplace_back(ticketNo, pnr, passengerId, trainId, originId, destinationId, seatNumber, fare, travelClassId, day, month, year);
+        tickets->emplace_back(ticketNo, pnr, passengerusername, trainId, originId, destinationId, seatNumber, fare, travelClassId, day, month, year);
     }
     tickets_file.close();
     cout << "Data loaded successfully!" << endl;
@@ -265,12 +266,6 @@ void loadDataFromFile()
             }
         }
     }
-    unordered_map<string, Passenger *> passengerMap;
-    for (auto &passenger : *passengers)
-    {
-        passengerMap[passenger.getUsername()] = &passenger;
-    }
-
     unordered_map<int, Train *> trainMap;
     for (auto &train : *trains)
     {
@@ -285,10 +280,6 @@ void loadDataFromFile()
 
     for (auto &&ticket : *tickets)
     {
-        if (passengerMap.count(ticket.getUserName()))
-        {
-            ticket.setPassenger((passengerMap[ticket.getUserName()]));
-        }
         if (trainMap.count(ticket.getTrainId()))
         {
             ticket.setTrain((trainMap[ticket.getTrainId()]));
@@ -309,5 +300,6 @@ void loadDataFromFile()
         Date date(day, month, year);
         ticket.setDate(date);
     }
+    Adminpanel.setTrains(*trains);
+    Adminpanel.setStations(*stations);
 }
-AdminPanel adminPanel(*trains, *stations);
