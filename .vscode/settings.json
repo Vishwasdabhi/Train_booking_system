@@ -4,6 +4,7 @@
         "ctime": "cpp",
         "ostream": "cpp",
         "fstream": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "new": "cpp"
     }
 }

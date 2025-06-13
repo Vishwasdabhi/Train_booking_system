@@ -1,4 +1,4 @@
-#include "backend.cpp"
+#include "backend.h"
 
 void loginPanel();
 void adminPanel();
@@ -17,8 +17,11 @@ void loginPanel()
     cout << "1. Admin" << endl;
     cout << "2. User Guest" << endl;
     cout << "3. Passenger" << endl;
-    cout << "4. Exit" << endl;
+    cout << "4. New User" << endl;
+    cout << "5. Exit" << endl;
     cout << "Enter your choice: ";
+    bool flag = false;
+    fflush(stdin);
     int choice;
     cin >> choice;
     switch (choice)
@@ -34,27 +37,26 @@ void loginPanel()
         if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD)
         {
             cout << "Login successful!" << endl;
-            char ch;
+            fflush(stdin);
             cout << "Press any key to continue...";
-            cin >> ch;
+            getchar();
             adminPanel();
+            return;
         }
         else
         {
             cout << "Invalid credentials. Please try again." << endl;
-            char ch;
+            fflush(stdin);
             cout << "Press any key to continue...";
-            cin >> ch;
+            getchar();
             loginPanel();
+            return;
         }
-        break;
-        adminPanel();
-        break;
     }
     case 2:
     {
         userGuestPanel();
-        break;
+        return;
     }
     case 3:
     {
@@ -71,9 +73,9 @@ void loginPanel()
             {
                 found = true;
                 cout << "Login successful!" << endl;
-                char ch;
+                fflush(stdin);
                 cout << "Press any key to continue...";
-                cin >> ch;
+                getchar();
                 passengerPanel(&passenger);
                 break;
             }
@@ -81,7 +83,11 @@ void loginPanel()
 
         break;
     }
-    case 4:
+    case 4:{
+        Adminpanel.addNewUser();
+        break;
+    }
+    case 5:
     {
         system("cls");
         cout << "Thank you for using the Train Management System!" << endl;
@@ -94,23 +100,23 @@ void loginPanel()
         cout << "___________|||______________________________|______________/" << endl;
         cout << "           |||                                        /--------" << endl;
         cout << "-----------'''---------------------------------------'" << endl;
-        return;
+        flag = true;
+        break;
     }
     default:
     {
-
         cout << "Invalid choice. Please try again." << endl;
-        char ch;
-        cout << "Press any key to continue...";
-        cin >> ch;
         loginPanel();
-        break;
+        return;
     }
     }
-    char ch;
-    cout << "Press any key to continue...";
-    cin >> ch;
-    loginPanel();
+    if (!flag)
+    {
+        fflush(stdin);
+        cout << "Press any key to continue...";
+        getchar();
+        loginPanel();
+    }
 }
 
 void adminPanel()
@@ -128,6 +134,7 @@ void adminPanel()
     cout << "7. Update Train Seats" << endl;
     cout << "8. Logout" << endl;
 
+    bool flag = false;
     cout << "Enter your choice: ";
     int choice;
     cin >> choice;
@@ -137,23 +144,18 @@ void adminPanel()
     {
         system("cls");
         Adminpanel.viewAllTrains();
-
         break;
     }
     case 2:
     {
         system("cls");
         Adminpanel.viewAllStations();
-
         break;
     }
     case 3:
     {
         system("cls");
         Adminpanel.addTrain();
-        char ch;
-        cout << "Press any key to continue...";
-        cin >> ch;
         break;
     }
     case 4:
@@ -242,11 +244,12 @@ void adminPanel()
     {
         system("cls");
         cout << "Logged out successfully." << endl;
-        char ch;
+        fflush(stdin);
         cout << "Press any key to continue...";
-        cin >> ch;
+        getchar();
+        flag = true;
         loginPanel();
-        break;
+        return;
     }
     default:
     {
@@ -254,10 +257,13 @@ void adminPanel()
         break;
     }
     }
-    char ch;
-    cout << "Press any key to continue...";
-    cin >> ch;
-    adminPanel();
+    if (!flag)
+    {
+        fflush(stdin);
+        cout << "Press any key to continue...";
+        getchar();
+        adminPanel();
+    }
 }
 
 void userGuestPanel()
@@ -270,6 +276,7 @@ void userGuestPanel()
     cout << "2. View Train Availability" << endl;
     cout << "3. Logout" << endl;
 
+    bool flag = false;
     UserGuest guest = UserGuest();
     cout << "Enter your choice: ";
     int choice;
@@ -303,17 +310,21 @@ void userGuestPanel()
     {
         system("cls");
         guest.logout();
-        char ch;
+        fflush(stdin);
         cout << "Press any key to continue...";
-        cin >> ch;
+        getchar();
+        flag = true;
         loginPanel();
-        break;
+        return;
     }
     }
-    char ch;
-    cout << "Press any key to continue...";
-    cin >> ch;
-    userGuestPanel();
+    if (!flag)
+    {
+        fflush(stdin);
+        cout << "Press any key to continue...";
+        getchar();
+        userGuestPanel();
+    }
 }
 void passengerPanel(Passenger *passenger)
 {
@@ -329,6 +340,8 @@ void passengerPanel(Passenger *passenger)
     cout << "5. View My Tickets" << endl;
     cout << "6. Change Password" << endl;
     cout << "7. Logout" << endl;
+
+    bool flag = false;
     cout << "Enter your choice: ";
     int choice;
     cin >> choice;
@@ -338,7 +351,7 @@ void passengerPanel(Passenger *passenger)
     {
         system("cls");
         Adminpanel.viewAllStations();
-       
+
         break;
     }
     case 2:
@@ -355,7 +368,7 @@ void passengerPanel(Passenger *passenger)
         cin >> day >> month >> year;
         date = Date(day, month, year);
         passenger->viewAvailability(from, to, date);
-        
+
         break;
     }
     case 3:
@@ -374,6 +387,7 @@ void passengerPanel(Passenger *passenger)
         vector<Train *> availableTrains = passenger->viewAvailability(from, to, date);
         cout << "Select a train by entering its index: ";
         int trainIndex;
+        fflush(stdin);
         cin >> trainIndex;
         while (trainIndex < 1 || trainIndex > availableTrains.size())
         {
@@ -382,36 +396,36 @@ void passengerPanel(Passenger *passenger)
             break;
         }
         Train *selectedTrain = availableTrains[trainIndex - 1];
-        cout << "Enter class name: ";
-        string className;
-        cin >> className;
-        TravelClass *selectedClass = nullptr;
         for (auto &&travelClass : selectedTrain->getClasses())
         {
-            if (travelClass.getClassName() == className)
-            {
-                selectedClass = &travelClass;
-                break;
-            }
+            cout << travelClass.getId() << ". " << travelClass.getClassName() << " - Available Seats: " << travelClass.getAvailableSeats() << ", Fare: " << travelClass.getFare() << endl;
         }
+        cout << "Select a class by entering its index: ";
+        int classIndex;
+        cin >> classIndex;
+        while (classIndex < 1 || classIndex > selectedTrain->getClasses().size())
+        {
+            cout << "Invalid class selection. Enter correct index: ";
+            cin >> classIndex;
+        }
+        TravelClass *selectedClass = &selectedTrain->getClasses()[classIndex - 1];
         Station *fromStation = Adminpanel.getStationByName(from);
         Station *toStation = Adminpanel.getStationByName(to);
-        passenger->bookTicket(*fromStation, *toStation, *selectedClass, date);
-       
+        passenger->bookTicket(selectedTrain, *fromStation, *toStation, *selectedClass, date);
+
         break;
     }
     case 4:
     {
         system("cls");
         passenger->cancelTicket();
-        
+
         break;
     }
     case 5:
     {
         system("cls");
         passenger->viewMyTickets();
-        
         break;
     }
     case 6:
@@ -447,23 +461,25 @@ void passengerPanel(Passenger *passenger)
         else
         {
             cout << "Failed to change password. Please try again." << endl;
-            char ch;
+            fflush(stdin);
             cout << "Press any key to continue...";
-            cin >> ch;
+            getchar();
             passengerPanel(passenger);
+            return;
         }
-       
+
         break;
     }
     case 7:
     {
         system("cls");
         passenger->logout();
-        char ch;
+        fflush(stdin);
         cout << "Press any key to continue...";
-        cin >> ch;
+        getchar();
+        flag = true;
         loginPanel();
-        break;
+        return;
     }
     default:
     {
@@ -472,8 +488,11 @@ void passengerPanel(Passenger *passenger)
         break;
     }
     }
-    char ch;
-    cout << "Press any key to continue...";
-    cin >> ch;
-    passengerPanel(passenger);
+    if (!flag)
+    {
+        fflush(stdin);
+        cout << "Press any key to continue...";
+        getchar();
+        passengerPanel(passenger);
+    }
 }

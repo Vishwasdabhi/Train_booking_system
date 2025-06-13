@@ -1,20 +1,28 @@
-#include "classes.cpp"
-#include <windows.h>
-#include <fstream>
+#include "classes.h"
 
-vector<Passenger> *passengers = new vector<Passenger>;
-vector<Station> *stations = new vector<Station>;
-vector<TravelClass> *travelClasses = new vector<TravelClass>;
-vector<Train> *trains = new vector<Train>;
-vector<Ticket> *tickets = new vector<Ticket>;
 
 void saveDataToFile()
 {
+    ofstream credentials_file("credentials.csv");
+    if (!credentials_file.is_open())
+    {
+        cout << "Error opening credentials file for writing." << endl;
+        return;
+    }
+    credentials_file.clear();
+    // Save credentials to file
+    for (auto &&passenger : *passengers)
+    {
+        credentials_file << passenger.getUsername() << "," << passenger.getPassword() << endl;
+    }
+    credentials_file.close();
+
     // Save passengers to file
     ofstream passenger_file("passengers.csv");
+    passenger_file.clear();
     if (!passenger_file.is_open())
     {
-        cout << "Error opening student information file for writing." << endl;
+        cout << "Error opening passenger file for writing." << endl;
         return;
     }
     for (auto &&passenger : *passengers)
@@ -24,6 +32,7 @@ void saveDataToFile()
     passenger_file.close();
     // Save stations to file
     ofstream stations_file("stations.csv");
+    stations_file.clear();
     if (!stations_file.is_open())
     {
         cout << "Error opening station information file for writing." << endl;
@@ -36,6 +45,7 @@ void saveDataToFile()
     stations_file.close();
     // Save travel classes to file
     ofstream travel_classes_file("travel_classes.csv");
+    travel_classes_file.clear();
     if (!travel_classes_file.is_open())
     {
         cout << "Error opening travel class information file for writing." << endl;
@@ -50,6 +60,7 @@ void saveDataToFile()
 
     // Save trains to file
     ofstream trains_file("trains.csv");
+    trains_file.clear();
     if (!trains_file.is_open())
     {
         cout << "Error opening train information file for writing." << endl;
@@ -63,9 +74,12 @@ void saveDataToFile()
 
     // Save tickets to file
     ofstream tickets_file("tickets.csv");
+    tickets_file.clear();
     if (!tickets_file.is_open())
     {
         cout << "Error opening ticket information file for writing." << endl;
+        fflush(stdin);
+        getchar();
         return;
     }
     for (auto &ticket : *tickets)
@@ -76,7 +90,7 @@ void saveDataToFile()
                      << ticket.getday() << "," << ticket.getmonth() << "," << ticket.getyear() << endl;
     }
     tickets_file.close();
-    cout << "Data saved successfully!" << endl;
+    // cout << "Data saved successfully!" << endl;
 }
 
 void loadDataFromFile()
@@ -85,7 +99,7 @@ void loadDataFromFile()
     ifstream passengers_file("passengers.csv");
     if (!passengers_file.is_open())
     {
-        cout << "Error opening student information file for reading." << endl;
+        cout << "Error opening passenger information file for reading." << endl;
         return;
     }
     string line;
@@ -98,19 +112,47 @@ void loadDataFromFile()
         getline(ss, email, ',');
         getline(ss, phone, ',');
         getline(ss, myTickets);
-        Passenger *passenger = new Passenger(username, "", fullName, email, phone);
+        // Passenger *passenger = new Passenger(username, "", fullName, email, phone);
+        passengers->emplace_back(username, "", fullName, email, phone);
         stringstream ticketsStream(myTickets);
         string ticketId;
         while (getline(ticketsStream, ticketId, ' '))
         {
             if (!ticketId.empty())
             {
-                passenger->addMyTicket(stoi(ticketId));
+                // passenger->addMyTicket(stoi(ticketId));
+                auto it = passengers->end();
+                it--;
+                it->addMyTicket(stoi(ticketId));
             }
         }
+        // passengers->push_back(*passenger);
+        // delete passenger;
     }
     passengers_file.close();
 
+    // Load credentials from file
+    ifstream credentials_file("credentials.csv");
+    if (!credentials_file.is_open())
+    {
+        cout << "Error opening credentials file for reading." << endl;
+        return;
+    }
+    while (getline(credentials_file, line))
+    {
+        stringstream ss(line);
+        string username, password;
+        getline(ss, username, ',');
+        getline(ss, password);
+        for (auto &&passenger : *passengers)
+        {
+            if (passenger.getUsername() == username)
+            {
+                passenger.setPassword(password);
+                break;
+            }
+        }
+    }
     // Load stations from file
     ifstream stations_file("stations.csv");
     if (!stations_file.is_open())
@@ -170,7 +212,9 @@ void loadDataFromFile()
         getline(ss, name, ',');
         getline(ss, routeStr, ',');
         getline(ss, classesStr, ',');
-        Train newTrain(id, name);
+        // Train newTrain(id, name);
+        trains->emplace_back(id, name);
+        Train &newTrain = trains->back();
 
         // Parse route
         stringstream routeStream(routeStr);
@@ -194,7 +238,7 @@ void loadDataFromFile()
             }
         }
 
-        trains->push_back(newTrain);
+        // trains->push_back(newTrain);
     }
     trains_file.close();
     // Load tickets from file
@@ -208,13 +252,12 @@ void loadDataFromFile()
     {
         stringstream ss(line);
         int ticketNo, trainId, originId, destinationId, seatNumber, travelClassId, day, month, year;
-        string pnr;
-        string passengerusername;
+        string pnr, passengerUsername;
+        float fare;
         ss >> ticketNo;
         ss.ignore(1); // Ignore the comma
         getline(ss, pnr, ',');
-        ss >> passengerusername;
-        ss.ignore(1); // Ignore the comma
+        getline(ss, passengerUsername, ',');
         ss >> trainId;
         ss.ignore(1); // Ignore the comma
         ss >> originId;
@@ -223,7 +266,6 @@ void loadDataFromFile()
         ss.ignore(1); // Ignore the comma
         ss >> seatNumber;
         ss.ignore(1); // Ignore the comma
-        float fare;
         ss >> fare;
         ss.ignore(1); // Ignore the comma
         ss >> travelClassId;
@@ -233,68 +275,72 @@ void loadDataFromFile()
         ss >> month;
         ss.ignore(1); // Ignore the comma
         ss >> year;
-
-        tickets->emplace_back(ticketNo, pnr, passengerusername, trainId, originId, destinationId, seatNumber, fare, travelClassId, day, month, year);
+        tickets->emplace_back(ticketNo, pnr, passengerUsername, trainId, originId, destinationId, seatNumber, fare, travelClassId, day, month, year);
     }
     tickets_file.close();
-    cout << "Data loaded successfully!" << endl;
 
     unordered_map<int, Ticket *> ticketMap;
-    for (auto &ticket : *tickets)
+    for (auto &&ticket : *tickets)
         ticketMap[ticket.getTicketNo()] = &ticket;
 
-    for (auto &passenger : *passengers)
+    unordered_map<string, Passenger *> passengerMap;
+    for (auto &&passenger : *passengers)
     {
-        for (int id : passenger.getMyTicketsvec())
-        {
-            if (ticketMap.count(id))
-                passenger.addTicketObject(*ticketMap[id]);
-        }
+        passengerMap[passenger.getUsername()] = &passenger;
     }
     unordered_map<int, TravelClass *> travelClassMap;
-    for (auto &travelClass : *travelClasses)
+    for (auto &&travelClass : *travelClasses)
     {
         travelClassMap[travelClass.getId()] = &travelClass;
     }
-    for (auto &train : *trains)
-    {
-        for (auto &classid : train.getClassIds())
-        {
-            if (travelClassMap.count(classid))
-            {
-                train.addClassObject(*(travelClassMap[classid]));
-            }
-        }
-    }
     unordered_map<int, Train *> trainMap;
-    for (auto &train : *trains)
+    for (auto &&train : *trains)
     {
         trainMap[train.getId()] = &train;
     }
 
     unordered_map<int, Station *> stationMap;
-    for (auto &station : *stations)
+    for (auto &&station : *stations)
     {
         stationMap[station.getId()] = &station;
     }
+    for (auto &&train : *trains)
+    {
+        for (auto &&classid : train.getClassIds())
+        {
+            if (travelClassMap.count(classid))
+            {
+                trainMap[train.getId()]->addClassObject(*(travelClassMap[classid]));
+            }
+        }
+    }
 
-    for (auto &&ticket : *tickets)
+    for (auto &ticket : *tickets)
     {
         if (trainMap.count(ticket.getTrainId()))
         {
-            ticket.setTrain((trainMap[ticket.getTrainId()]));
+            Train *train = (trainMap[ticket.getTrainId()]);
+            ticket.setTrain(*train);
         }
         if (stationMap.count(ticket.getOriginId()))
         {
-            ticket.setOrigin((stationMap[ticket.getOriginId()]));
+            Station *origin = (stationMap[ticket.getOriginId()]);
+            ticket.setOrigin(*origin);
         }
         if (stationMap.count(ticket.getDestinationId()))
         {
-            ticket.setDestination((stationMap[ticket.getDestinationId()]));
+            Station *destination = (stationMap[ticket.getDestinationId()]);
+            ticket.setDestination(*destination);
         }
         if (travelClassMap.count(ticket.getTravelClassId()))
         {
-            ticket.setTravelClass((travelClassMap[ticket.getTravelClassId()]));
+            TravelClass *travelClass = (travelClassMap[ticket.getTravelClassId()]);
+            ticket.setTravelClass(*travelClass);
+        }
+        if (passengerMap.count(ticket.getpassengerUserName()))
+        {
+            Passenger *p = passengerMap[ticket.getpassengerUserName()];
+            p->addTicketObject(ticket);
         }
         int day = ticket.getday(), month = ticket.getmonth(), year = ticket.getyear();
         Date date(day, month, year);
@@ -302,4 +348,5 @@ void loadDataFromFile()
     }
     Adminpanel.setTrains(*trains);
     Adminpanel.setStations(*stations);
+    // cout << "Data loaded successfully!" << endl;
 }

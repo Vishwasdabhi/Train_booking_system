@@ -1,4 +1,4 @@
-#include "frontend.cpp"
+#include "frontend.h"
 int main()
 {
 
@@ -8,10 +8,10 @@ int main()
     cout << "      >(________|__|_[_________]_|____|_/\\_|___|_|___________|_|" << endl;
     cout << "      _/oo OOOOO oo`  ooo   ooo   o^o       o^o   o^o     o^o" << endl;
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << endl;
-    char ch;
-    cin >> ch;
     seed();
     loadDataFromFile();
+    fflush(stdin);
+    getchar();
     loginPanel();
     saveDataToFile();
     delete passengers;
