@@ -1,7 +1,10 @@
 #include "frontend.h"
 int main()
 {
-
+    system("chcp 65001");
+    system("color 0A"); 
+    system("chcp 65001");
+    system("cls");
     cout << "           o x o x o x o . . ." << endl;
     cout << "         o      _____            _______________ ___=====__T___" << endl;
     cout << "       .][__n_n_|DD[  ====_____  |    |.\\/.|   | |   |_|     |_" << endl;
@@ -11,7 +14,7 @@ int main()
     seed();
     loadDataFromFile();
     fflush(stdin);
-    getchar();
+    _getch();
     loginPanel();
     saveDataToFile();
     delete passengers;

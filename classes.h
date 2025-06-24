@@ -1,5 +1,5 @@
-#include <iostream>
 #include <bits/stdc++.h>
+#include <conio.h>
 
 using namespace std;
 
@@ -361,13 +361,21 @@ class AdminPanel
 {
     vector<Train> trains_admin;
     vector<Station> stations_admin;
+    int max_ticket_number = 1000;
 
 public:
     AdminPanel() {}
     AdminPanel(vector<Train> &trains, vector<Station> &stations) : trains_admin(trains), stations_admin(stations) {}
     int generateTicketNo();
     string generatePNR();
-
+    int getMaxTicketNumber()
+    {
+        return max_ticket_number;
+    }
+    void setMaxTicketNumber(int newMaxTicketNumber)
+    {
+        max_ticket_number = newMaxTicketNumber;
+    }
     void setTrains(vector<Train> &newTrains)
     {
         trains_admin = newTrains;
@@ -383,6 +391,14 @@ public:
     vector<Train *> getTrains();
     vector<Station *> getStations();
 
+    vector<Train> &getTrainsObj()
+    {
+        return trains_admin;
+    }
+    vector<Station> &getStationsObj()
+    {
+        return stations_admin;
+    }
     map<int, Station *> getStationsMap()
     {
         map<int, Station *> stationMap;
@@ -484,7 +500,9 @@ bool User::changePassword(string newPass)
 }
 void User::logout()
 {
-    cout << "Logged out successfully." << endl;
+    cout << "╔════════════════════════════════════════════════════╗" << endl;
+    cout << "║        You have been logged out successfully.      ║" << endl;
+    cout << "╚════════════════════════════════════════════════════╝" << endl;
 }
 
 void UserGuest::viewStations()
@@ -494,6 +512,10 @@ void UserGuest::viewStations()
 
 vector<Train *> UserGuest::viewAvailability(string &from, string &to, Date &date)
 {
+    system("cls");
+    cout << "╔════════════════════════════════════════════════════╗" << endl;
+    cout << "║             Train Availability Search              ║" << endl;
+    cout << "╚════════════════════════════════════════════════════╝" << endl;
     vector<Station *> stations = Adminpanel.getStations();
     int fromId = -1, toId = -1;
     for (auto &&station : stations)
@@ -531,22 +553,27 @@ vector<Train *> UserGuest::viewAvailability(string &from, string &to, Date &date
         if (fromFound && toFound)
         {
             vector<TravelClass> classes = train->getClasses();
+            cout << "----------------------------------------------------" << endl;
+            cout << availableTrains.size() + 1 << ". Train ID: " << train->getId() << ", Name: " << train->getName() << endl;
+            cout << "Available Classes: " << endl;
+            cout << "----------------------------------------------------" << endl;
             for (auto &&travelclass : classes)
             {
                 if (travelclass.getAvailableSeats() > 0)
                 {
-                    cout << availableTrains.size() + 1 << ". Train ID: " << train->getId() << ", Name: " << train->getName() << endl;
-                    cout << "Available Classes: " << endl;
-                    cout << travelclass.getClassName() << " - Available Seats: " << travelclass.getAvailableSeats() << ", Fare: " << travelclass.getFare() << endl;
-                    availableTrains.insert(train);
-                    availableTrainsVec.push_back(train);
+                    cout << " - " << travelclass.getClassName()
+                         << " | Seats: " << travelclass.getAvailableSeats()
+                         << " | Fare: " << travelclass.getFare() << endl;
                 }
             }
+            cout << "----------------------------------------------------" << endl;
+            availableTrains.insert(train);
+            availableTrainsVec.push_back(train);
         }
     }
     if (availableTrainsVec.empty())
     {
-        cout << "No trains available for the selected route and date." << endl;
+        cout << "No trains available for the selected route." << endl;
         return {};
     }
     return availableTrainsVec;
@@ -579,16 +606,38 @@ void Passenger ::bookTicket(Train *selectedTrain, Station &from, Station &to, Tr
 
 void Passenger::cancelTicket()
 {
+    system("cls");
     if (myTickets.empty())
     {
-        cout << "No tickets booked yet." << endl;
+        cout << "╔════════════════════════════════════════════════════╗" << endl;
+        cout << "║               Ticket Cancellation Panel            ║" << endl;
+        cout << "╠════════════════════════════════════════════════════╣" << endl;
+        cout << "║               No tickets booked yet.               ║" << endl;
+        cout << "╚════════════════════════════════════════════════════╝" << endl;
         return;
     }
+
+    cout << "╔═══════════════════════════════════════════════════════════════════╗" << endl;
+    cout << "║                 Ticket Cancellation Panel                         ║" << endl;
+    cout << "╠══════╦════════════╦════════════════════════════════╦══════════════╣" << endl;
+    cout << "║ S.No ║ Ticket No  ║ Train Name                     ║ Travel Date  ║" << endl;
+    cout << "╠══════╬════════════╬════════════════════════════════╬══════════════╣" << endl;
+
     for (int i = 0; i < myTickets.size(); i++)
     {
-        cout << i + 1 << ". Ticket No: " << myTickets[i].getPNR() << endl;
+        string trainName = myTickets[i].getTrain().getName();
+        if (trainName.length() > 30)
+            trainName = trainName.substr(0, 27) + "...";
+        printf("║ %-4d ║ %-10d ║ %-30s ║ %-12s ║\n",
+               i + 1,
+               myTickets[i].getTicketNo(),
+               trainName.c_str(),
+               myTickets[i].getDate().show_date().c_str());
     }
+
+    cout << "╚══════╩════════════╩════════════════════════════════╩══════════════╝" << endl;
     cout << "Enter the serial number of the ticket you want to cancel: ";
+
     int ticketIndex;
     cin >> ticketIndex;
     while (ticketIndex < 1 || ticketIndex > myTickets.size())
@@ -597,22 +646,55 @@ void Passenger::cancelTicket()
         cin >> ticketIndex;
     }
     myTickets.erase(myTickets.begin() + ticketIndex - 1);
-    cout << "Ticket cancelled successfully!" << endl;
+    cout << "╔════════════════════════════════════════════════════╗" << endl;
+    cout << "║        Ticket cancelled successfully!              ║" << endl;
+    cout << "╚════════════════════════════════════════════════════╝" << endl;
 }
 
 void Passenger::viewMyTickets()
 {
+    system("cls");
     if (myTickets.empty())
     {
-        cout << "No tickets booked yet." << endl;
+        cout << "╔══════════════════════════════════════════════╗" << endl;
+        cout << "║         No tickets booked yet.               ║" << endl;
+        cout << "╚══════════════════════════════════════════════╝" << endl;
         return;
     }
-    cout << myTickets.size() << endl;
+
+    cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗" << endl;
+    cout << "║                                   My Booked Tickets                                                                  ║" << endl;
+    cout << "╠════╦════════════╦════════════════════════════╦══════════════╦══════════════════════╦══════════════╦══════════════════╣" << endl;
+    cout << "║ No ║ Ticket No  ║ Train Name                 ║ Travel Date  ║ From → To            ║ Seat Number  ║ Class            ║" << endl;
+    cout << "╠════╬════════════╬════════════════════════════╬══════════════╬══════════════════════╬══════════════╬══════════════════╣" << endl;
+
     for (int i = 0; i < myTickets.size(); i++)
     {
-        cout << i + 1 << ' ';
-        myTickets[i].viewTicket();
+        Ticket &t = myTickets[i];
+        string trainName = t.getTrain().getName();
+        if (trainName.length() > 26)
+            trainName = trainName.substr(0, 23) + "...";
+
+        string date = t.getDate().show_date();
+        string from = t.getOrigin().getName();
+        string to = t.getDestination().getName();
+        string fromTo = from + " → " + to;
+        if (fromTo.length() > 22)
+            fromTo = fromTo.substr(0, 19) + "...";
+
+        string travelClass = t.getTravelClass().getClassName();
+
+        printf("║ %-2d ║ %-10d ║ %-26s ║ %-12s ║ %-22s ║ %-12d ║ %-16s ║\n",
+               i + 1,
+               t.getTicketNo(),
+               trainName.c_str(),
+               date.c_str(),
+               fromTo.c_str(),
+               t.getSeatNumber(),
+               travelClass.c_str());
     }
+
+    cout << "╚════╩════════════╩════════════════════════════╩══════════════╩══════════════════════╩══════════════╩══════════════════╝" << endl;
 }
 
 int Station::getId()
@@ -625,9 +707,16 @@ string Station::getName()
 }
 void Station::viewStation()
 {
-    cout << "Station ID: " << stationId << ", Name: " << name << endl;
-}
+    cout << "╔════════════════════════════════════════╗" << endl;
 
+    string idLine = "║ Station ID : " + to_string(stationId);
+    cout << idLine << string(42 - idLine.length() - 1, ' ') << "║" << endl;
+
+    string nameLine = "║ Name       : " + name;
+    cout << nameLine << string(42 - nameLine.length() - 1, ' ') << "║" << endl;
+
+    cout << "╚════════════════════════════════════════╝" << endl;
+}
 string TravelClass::getClassName()
 {
     return className;
@@ -703,20 +792,29 @@ void Train::addClass(TravelClass &newClass)
 }
 void Train::viewTrain()
 {
-    cout << "Train ID: " << trainId << ", Name: " << name << endl;
-    cout << "Route: ";
-    for (auto &&stationId : route)
+    cout << "Train ID     : " << trainId << endl;
+    cout << "Train Name   : " << name << endl;
+
+    cout << "Route        : ";
+    for (size_t i = 0; i < route.size(); ++i)
     {
-        cout << stationId << " ";
+        cout << route[i];
+        if (i != route.size() - 1)
+            cout << " → ";
     }
     cout << endl;
-    cout << "Classes: " << endl;
-    for (auto &&travelClass : classes)
+
+    cout << "Classes      :\n";
+    for (auto &travelClass : classes)
     {
-        cout << travelClass.getClassName() << " - Total Seats: " << travelClass.getAvailableSeats() + travelClass.getBookedSeats()
-             << ", Available Seats: " << travelClass.getAvailableSeats() << ", Fare: " << travelClass.getFare() << endl;
+        int totalSeats = travelClass.getAvailableSeats() + travelClass.getBookedSeats();
+        cout << "  - " << travelClass.getClassName()
+             << " | Total: " << totalSeats
+             << " | Available: " << travelClass.getAvailableSeats()
+             << " | Fare: " << travelClass.getFare() << endl;
     }
 }
+
 int Ticket::getTicketNo()
 {
     return ticketNo;
@@ -761,47 +859,63 @@ void Ticket::printTicket()
     // print ticket in HTML file
 }
 
-void Ticket ::viewTicket()
+void Ticket::viewTicket()
 {
-    cout << "Ticket No: " << ticketNo << endl;
-    cout << "PNR: " << pnr << endl;
-    cout << "Passenger: " << passengerUsername << endl;
-    cout << "Train: " << train.getName() << endl;
-    cout << "From: " << origin.getName() << " To: " << destination.getName() << endl;
-    cout << "Date: " << date.show_date() << endl;
-    cout << "Travel Class: " << travelClass.getClassName() << endl;
-    cout << "Seat Number: " << seatNumber << endl;
-    cout << "Fare: " << fare << endl;
+    cout << "╔══════════════════════════════════════════════╗" << endl;
+    cout << "║               Ticket Details                 ║" << endl;
+    cout << "╠══════════════════════════════════════════════╣" << endl;
+    printf("║ %-20s : %-20d ║\n", "Ticket No", ticketNo);
+    printf("║ %-20s : %-20s ║\n", "PNR", pnr.c_str());
+    printf("║ %-20s : %-20s ║\n", "Passenger", passengerUsername.c_str());
+    printf("║ %-20s : %-20s ║\n", "Train", train.getName().c_str());
+    printf("║ %-20s : %-20s ║\n", "From", origin.getName().c_str());
+    printf("║ %-20s : %-20s ║\n", "To", destination.getName().c_str());
+    printf("║ %-20s : %-20s ║\n", "Date", date.show_date().c_str());
+    printf("║ %-20s : %-20s ║\n", "Travel Class", travelClass.getClassName().c_str());
+    printf("║ %-20s : %-20d ║\n", "Seat Number", seatNumber);
+    printf("║ %-20s : %-20.2f ║\n", "Fare", fare);
+    cout << "╚══════════════════════════════════════════════╝" << endl;
 }
 
 int AdminPanel ::generateTicketNo()
 {
-    static int ticketNo = 10000;
+    static int ticketNo = max_ticket_number + 1;
     return ticketNo++;
 }
 string AdminPanel ::generatePNR()
 {
     vector<char> numbers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(1, 100);
     string pnr = "";
     while (pnr.length() < 10)
     {
-        pnr += numbers[rand() % numbers.size()];
+        int RandomNumber = dist(gen);
+        pnr += numbers[RandomNumber % numbers.size()];
     }
     return pnr;
 }
 
 void AdminPanel::addTrain()
 {
+    system("cls");
+    cout << "╔══════════════════════════════════════╗" << endl;
+    cout << "║         Add New Train Details        ║" << endl;
+    cout << "╚══════════════════════════════════════╝" << endl;
+
     int id;
     string name;
-    cout << "Enter Train ID: ";
+    cout << "\nEnter Train ID        : ";
     cin >> id;
-    cout << "Enter Train Name: ";
+    cout << "Enter Train Name      : ";
     cin.ignore();
     getline(cin, name);
+
     Train newTrain(id, name);
     vector<int> route;
     vector<Station *> stations = getStations();
+
     viewAllStations();
     cout << "Enter the number of stations in the route: ";
     int numStations;
@@ -819,6 +933,10 @@ void AdminPanel::addTrain()
         route.push_back(stations[stationInd - 1]->getId());
     }
     newTrain.setroute(route);
+
+    cout << "╔══════════════════════════════════════╗" << endl;
+    cout << "║      Available Travel Classes        ║" << endl;
+    cout << "╚══════════════════════════════════════╝" << endl;
     int numClasses;
     cout << "Enter the number of travel classes: ";
     cin >> numClasses;
@@ -826,7 +944,7 @@ void AdminPanel::addTrain()
     {
         cout << i + 1 << ". " << travelClasses->at(i).getClassName() << endl;
     }
-    cout << "Enter the indices of classes you want to add (space seperated) : ";
+    cout << "Enter class indices to add (space separated): ";
     int classIndex;
     for (int i = 0; i < numClasses; i++)
     {
@@ -846,13 +964,20 @@ void AdminPanel::addTrain()
 
 void AdminPanel::addStation()
 {
+    system("cls");
+    cout << "╔══════════════════════════════════════╗" << endl;
+    cout << "║         Add New Station              ║" << endl;
+    cout << "╚══════════════════════════════════════╝" << endl;
+
     int id;
     string name;
-    cout << "Enter Station ID: ";
+
+    cout << "\nEnter Station ID     : ";
     cin >> id;
-    cout << "Enter Station Name: ";
+    cout << "Enter Station Name   : ";
     cin.ignore();
     getline(cin, name);
+
     Station newStation(id, name);
     stations_admin.push_back(newStation);
     stations->push_back(newStation);
@@ -876,17 +1001,21 @@ vector<Station *> AdminPanel::getStations()
     }
     return stationPointers;
 }
-
 void AdminPanel::viewAllTrains()
 {
     if (trains_admin.empty())
     {
-        cout << "No trains available." << endl;
+        cout << "╔════════════════════════════════════════════════════╗" << endl;
+        cout << "║              No trains available                   ║" << endl;
+        cout << "╚════════════════════════════════════════════════════╝" << endl;
         return;
     }
+
     for (int i = 0; i < trains_admin.size(); i++)
     {
-        cout << i + 1 << ". ";
+        cout << "═════════════════════════════════════════════════════════════════" << endl;
+        cout << "Train #" << i + 1 << endl;
+        cout << "═════════════════════════════════════════════════════════════════" << endl;
         trains_admin[i].viewTrain();
     }
 }
@@ -894,18 +1023,38 @@ void AdminPanel::viewAllStations()
 {
     if (stations_admin.empty())
     {
-        cout << "No stations available." << endl;
+        cout << "╔════════════════════════════════════════════════════╗" << endl;
+        cout << "║              No stations available                 ║" << endl;
+        cout << "╚════════════════════════════════════════════════════╝" << endl;
         return;
     }
+
+    cout << "╔════════════════════════════════════════════════════╗" << endl;
+    cout << "║                List of Stations                    ║" << endl;
+    cout << "╠════╦════════════╦══════════════════════════════════╣" << endl;
+    cout << "║ No ║ Station ID ║ Name                             ║" << endl;
+    cout << "╠════╬════════════╬══════════════════════════════════╣" << endl;
+
     for (int i = 0; i < stations_admin.size(); i++)
     {
-        cout << i + 1 << ". ";
-        stations_admin[i].viewStation();
+        cout << "║ ";
+        cout.width(2);
+        cout << left << i + 1 << " ║ ";
+        cout.width(10);
+        cout << left << stations_admin[i].getId() << " ║ ";
+        cout.width(32);
+        cout << left << stations_admin[i].getName() << " ║" << endl;
     }
+
+    cout << "╚════╩════════════╩══════════════════════════════════╝" << endl;
 }
 
 void AdminPanel ::updateTrainRoute(int trainId)
 {
+    system("cls");
+    cout << "╔════════════════════════════════════════════════════╗" << endl;
+    cout << "║              Update Train Route                    ║" << endl;
+    cout << "╚════════════════════════════════════════════════════╝" << endl;
     for (auto &&train : trains_admin)
     {
         if (train.getId() == trainId)
@@ -1036,21 +1185,25 @@ int Date ::Calculate_days(Date Start_date, Date End_date)
         return days;
     }
 }
-
 string Date::show_date()
 {
-    string date = "";
+    stringstream ss;
     if (day < 10)
-        date += "0";
-    date += to_string(day) + "/";
+        ss << '0';
+    ss << day << '/';
     if (month < 10)
-        date += "0";
-    date += to_string(month) + "/";
-    date += to_string(year);
-    return date;
+        ss << '0';
+    ss << month << '/';
+    ss << year;
+    return ss.str();
 }
+
 void AdminPanel ::addNewUser()
 {
+    system("cls");
+    cout << "╔══════════════════════════════════════════════╗" << endl;
+    cout << "║           Register New Passenger             ║" << endl;
+    cout << "╚══════════════════════════════════════════════╝" << endl;
     string username, password;
     cout << "Enter username: ";
     cin >> username;
@@ -1086,5 +1239,7 @@ void AdminPanel ::addNewUser()
     }
     Passenger newPassenger(username, password, fullName, email, phone);
     passengers->push_back(newPassenger);
-    cout << "User added successfully!" << endl;
+    cout << "╔══════════════════════════════════════════════╗" << endl;
+    cout << "║            User added successfully!          ║" << endl;
+    cout << "╚══════════════════════════════════════════════╝" << endl;
 }

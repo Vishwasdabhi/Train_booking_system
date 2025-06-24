@@ -1,8 +1,19 @@
 #include "classes.h"
 
-
 void saveDataToFile()
 {
+    trains->clear();
+    stations->clear();
+    *trains = Adminpanel.getTrainsObj();
+    *stations = Adminpanel.getStationsObj();
+    tickets->clear();
+    for (auto &&passenger : *passengers)
+    {
+        for (auto &&ticket : passenger.getMyTicketsObj())
+        {
+            tickets->push_back(ticket);
+        }
+    }
     ofstream credentials_file("credentials.csv");
     if (!credentials_file.is_open())
     {
@@ -79,7 +90,7 @@ void saveDataToFile()
     {
         cout << "Error opening ticket information file for writing." << endl;
         fflush(stdin);
-        getchar();
+        _getch();
         return;
     }
     for (auto &ticket : *tickets)
@@ -275,13 +286,18 @@ void loadDataFromFile()
         ss >> month;
         ss.ignore(1); // Ignore the comma
         ss >> year;
+        int mximumTicketNumber = Adminpanel.getMaxTicketNumber();
+        if (ticketNo > mximumTicketNumber)
+        {
+            Adminpanel.setMaxTicketNumber(ticketNo);
+        }
         tickets->emplace_back(ticketNo, pnr, passengerUsername, trainId, originId, destinationId, seatNumber, fare, travelClassId, day, month, year);
     }
     tickets_file.close();
-
+    
     unordered_map<int, Ticket *> ticketMap;
     for (auto &&ticket : *tickets)
-        ticketMap[ticket.getTicketNo()] = &ticket;
+    ticketMap[ticket.getTicketNo()] = &ticket;
 
     unordered_map<string, Passenger *> passengerMap;
     for (auto &&passenger : *passengers)
@@ -350,3 +366,4 @@ void loadDataFromFile()
     Adminpanel.setStations(*stations);
     // cout << "Data loaded successfully!" << endl;
 }
+
