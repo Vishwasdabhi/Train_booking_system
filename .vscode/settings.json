@@ -5,6 +5,8 @@
         "ostream": "cpp",
         "fstream": "cpp",
         "iosfwd": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "chrono": "cpp",
+        "iomanip": "cpp"
     }
 }

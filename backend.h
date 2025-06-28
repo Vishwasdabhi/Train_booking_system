@@ -1,15 +1,16 @@
 #include "classes.h"
 
+
 void saveDataToFile()
 {
     trains->clear();
     stations->clear();
-    *trains = Adminpanel.getTrainsObj();
-    *stations = Adminpanel.getStationsObj();
+    *trains = Adminpanel.getAllTrainsObj();
+    *stations = Adminpanel.getAllStationsObj();
     tickets->clear();
     for (auto &&passenger : *passengers)
     {
-        for (auto &&ticket : passenger.getMyTicketsObj())
+        for (auto &&ticket : passenger.getPassengerTicketsObj())
         {
             tickets->push_back(ticket);
         }
@@ -24,7 +25,7 @@ void saveDataToFile()
     // Save credentials to file
     for (auto &&passenger : *passengers)
     {
-        credentials_file << passenger.getUsername() << "," << passenger.getPassword() << endl;
+        credentials_file << passenger.getPassengerUsername() << "," << passenger.getPassengerPassword() << endl;
     }
     credentials_file.close();
 
@@ -38,7 +39,7 @@ void saveDataToFile()
     }
     for (auto &&passenger : *passengers)
     {
-        passenger_file << passenger.getUsername() << "," << passenger.getFullName() << "," << passenger.getEmail() << "," << passenger.getPhone() << "," << passenger.getMyTickets() << endl;
+        passenger_file << passenger.getPassengerUsername() << "," << passenger.getPassengerFullName() << "," << passenger.getPassengerEmail() << "," << passenger.getPassengerPhone() << "," << passenger.getPassengerTickets() << endl;
     }
     passenger_file.close();
     // Save stations to file
@@ -51,7 +52,7 @@ void saveDataToFile()
     }
     for (auto &&station : *stations)
     {
-        stations_file << station.getId() << "," << station.getName() << endl;
+        stations_file << station.getStationId() << "," << station.getStationName() << endl;
     }
     stations_file.close();
     // Save travel classes to file
@@ -64,7 +65,7 @@ void saveDataToFile()
     }
     for (auto &&travelClass : *travelClasses)
     {
-        travel_classes_file << travelClass.getId() << "," << travelClass.getClassName() << "," << travelClass.getTotalSeats() << ","
+        travel_classes_file << travelClass.getTravelClassId() << "," << travelClass.getTravelClassName() << "," << travelClass.getTotalSeats() << ","
                             << travelClass.getBookedSeats() << "," << travelClass.getFare() << endl;
     }
     travel_classes_file.close();
@@ -79,7 +80,7 @@ void saveDataToFile()
     }
     for (auto &&train : *trains)
     {
-        trains_file << train.getId() << "," << train.getName() << "," << train.getroutestr() << "," << train.getClassesStr() << endl;
+        trains_file << train.getTrainId() << "," << train.getTrainName() << "," << train.getTrainRouteStr() << "," << train.getTravelClassesStr() << endl;
     }
     trains_file.close();
 
@@ -95,10 +96,10 @@ void saveDataToFile()
     }
     for (auto &ticket : *tickets)
     {
-        tickets_file << ticket.getTicketNo() << "," << ticket.getPNR() << "," << ticket.getpassengerUserName() << ","
-                     << ticket.gettrainIdfromObj() << "," << ticket.getoriginIdfromObj() << "," << ticket.getdestinationIdfromObj() << ","
-                     << ticket.getSeatNumber() << "," << ticket.getFare() << "," << ticket.gettravelClassIdfromObj() << ","
-                     << ticket.getday() << "," << ticket.getmonth() << "," << ticket.getyear() << endl;
+        tickets_file << ticket.getTicketNo() << "," << ticket.getPNR() << "," << ticket.getPassengerUserNameFromTicket() << ","
+                     << ticket.getTrainIdFromObj() << "," << ticket.getOriginIdFromObj() << "," << ticket.getDestinationIdFromObj() << ","
+                     << ticket.getTicketSeatNumber() << "," << ticket.getTicketFare() << "," << ticket.getTravelClassIdFromObj() << ","
+                     << ticket.getDayFromObj() << "," << ticket.getMonthFromObj() << "," << ticket.getYearFromObj() << endl;
     }
     tickets_file.close();
     // cout << "Data saved successfully!" << endl;
@@ -134,7 +135,7 @@ void loadDataFromFile()
                 // passenger->addMyTicket(stoi(ticketId));
                 auto it = passengers->end();
                 it--;
-                it->addMyTicket(stoi(ticketId));
+                it->addPassengerTicket(stoi(ticketId));
             }
         }
         // passengers->push_back(*passenger);
@@ -157,7 +158,7 @@ void loadDataFromFile()
         getline(ss, password);
         for (auto &&passenger : *passengers)
         {
-            if (passenger.getUsername() == username)
+            if (passenger.getPassengerUsername() == username)
             {
                 passenger.setPassword(password);
                 break;
@@ -234,7 +235,7 @@ void loadDataFromFile()
         {
             if (!stationId.empty())
             {
-                newTrain.addroute(stoi(stationId));
+                newTrain.addTrainRoute(stoi(stationId));
             }
         }
 
@@ -245,7 +246,7 @@ void loadDataFromFile()
         {
             if (!classId.empty())
             {
-                newTrain.addclassid(stoi(classId));
+                newTrain.addTravelClassId(stoi(classId));
             }
         }
 
@@ -294,76 +295,75 @@ void loadDataFromFile()
         tickets->emplace_back(ticketNo, pnr, passengerUsername, trainId, originId, destinationId, seatNumber, fare, travelClassId, day, month, year);
     }
     tickets_file.close();
-    
+
     unordered_map<int, Ticket *> ticketMap;
     for (auto &&ticket : *tickets)
-    ticketMap[ticket.getTicketNo()] = &ticket;
+        ticketMap[ticket.getTicketNo()] = &ticket;
 
     unordered_map<string, Passenger *> passengerMap;
     for (auto &&passenger : *passengers)
     {
-        passengerMap[passenger.getUsername()] = &passenger;
+        passengerMap[passenger.getPassengerUsername()] = &passenger;
     }
     unordered_map<int, TravelClass *> travelClassMap;
     for (auto &&travelClass : *travelClasses)
     {
-        travelClassMap[travelClass.getId()] = &travelClass;
+        travelClassMap[travelClass.getTravelClassId()] = &travelClass;
     }
     unordered_map<int, Train *> trainMap;
     for (auto &&train : *trains)
     {
-        trainMap[train.getId()] = &train;
+        trainMap[train.getTrainId()] = &train;
     }
 
     unordered_map<int, Station *> stationMap;
     for (auto &&station : *stations)
     {
-        stationMap[station.getId()] = &station;
+        stationMap[station.getStationId()] = &station;
     }
     for (auto &&train : *trains)
     {
-        for (auto &&classid : train.getClassIds())
+        for (auto &&classid : train.getTravelClassIds())
         {
             if (travelClassMap.count(classid))
             {
-                trainMap[train.getId()]->addClassObject(*(travelClassMap[classid]));
+                trainMap[train.getTrainId()]->addTravelClassObject(*(travelClassMap[classid]));
             }
         }
     }
 
     for (auto &ticket : *tickets)
     {
-        if (trainMap.count(ticket.getTrainId()))
+        if (trainMap.count(ticket.getTrainIdFromTicket()))
         {
-            Train *train = (trainMap[ticket.getTrainId()]);
-            ticket.setTrain(*train);
+            Train *train = (trainMap[ticket.getTrainIdFromTicket()]);
+            ticket.setTrainInTicket(*train);
         }
-        if (stationMap.count(ticket.getOriginId()))
+        if (stationMap.count(ticket.getOriginIdFromTicket()))
         {
-            Station *origin = (stationMap[ticket.getOriginId()]);
-            ticket.setOrigin(*origin);
+            Station *origin = (stationMap[ticket.getOriginIdFromTicket()]);
+            ticket.setOriginInTicket(*origin);
         }
-        if (stationMap.count(ticket.getDestinationId()))
+        if (stationMap.count(ticket.getDestinationIdFromTicket()))
         {
-            Station *destination = (stationMap[ticket.getDestinationId()]);
-            ticket.setDestination(*destination);
+            Station *destination = (stationMap[ticket.getDestinationIdFromTicket()]);
+            ticket.setDestinationInTicket(*destination);
         }
-        if (travelClassMap.count(ticket.getTravelClassId()))
+        if (travelClassMap.count(ticket.getTravelClassIdFromTicket()))
         {
-            TravelClass *travelClass = (travelClassMap[ticket.getTravelClassId()]);
-            ticket.setTravelClass(*travelClass);
+            TravelClass *travelClass = (travelClassMap[ticket.getTravelClassIdFromTicket()]);
+            ticket.setTravelClassInTicket(*travelClass);
         }
-        if (passengerMap.count(ticket.getpassengerUserName()))
+        if (passengerMap.count(ticket.getPassengerUserNameFromTicket()))
         {
-            Passenger *p = passengerMap[ticket.getpassengerUserName()];
-            p->addTicketObject(ticket);
+            Passenger *p = passengerMap[ticket.getPassengerUserNameFromTicket()];
+            p->addPassengerTicketObject(ticket);
         }
-        int day = ticket.getday(), month = ticket.getmonth(), year = ticket.getyear();
+        int day = ticket.getDayFromTicket(), month = ticket.getMonthFromTicket(), year = ticket.getYearFromTicket();
         Date date(day, month, year);
-        ticket.setDate(date);
+        ticket.setDateInTicket(date);
     }
     Adminpanel.setTrains(*trains);
     Adminpanel.setStations(*stations);
     // cout << "Data loaded successfully!" << endl;
 }
-

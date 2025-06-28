@@ -1,7 +1,6 @@
 #include "frontend.h"
 int main()
 {
-    system("chcp 65001");
     system("color 0A"); 
     system("chcp 65001");
     system("cls");
@@ -11,7 +10,7 @@ int main()
     cout << "      >(________|__|_[_________]_|____|_/\\_|___|_|___________|_|" << endl;
     cout << "      _/oo OOOOO oo`  ooo   ooo   o^o       o^o   o^o     o^o" << endl;
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << endl;
-    seed();
+    SeedForRandom();
     loadDataFromFile();
     fflush(stdin);
     _getch();

@@ -38,7 +38,8 @@ void loginPanel()
         cout << "Enter Admin Username: ";
         cin >> username;
         cout << "Enter Admin Password: ";
-        cin >> password;
+        // cin >> password;
+        password = inputPassword();
         if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD)
         {
             cout << "Login successful!" << endl;
@@ -73,11 +74,12 @@ void loginPanel()
         cout << "Enter Passenger Username: ";
         cin >> username;
         cout << "Enter Passenger Password: ";
-        cin >> password;
+        // cin >> password;
+        password = inputPassword();
         bool found = false;
         for (auto &&passenger : *passengers)
         {
-            if (passenger.getUsername() == username && passenger.getPassword() == password)
+            if (passenger.getPassengerUsername() == username && passenger.getPassengerPassword() == password)
             {
                 found = true;
                 cout << "Login successful!" << endl;
@@ -88,7 +90,8 @@ void loginPanel()
                 return;
             }
         }
-
+        cout << "You entered : " << password << endl;
+        cout << "Invalid credentials. Please try again." << endl;
         break;
     }
     case 4:
@@ -169,22 +172,22 @@ void adminPanel()
     case 3:
     {
         system("cls");
-        Adminpanel.addTrain();
+        Adminpanel.addNewTrain();
         break;
     }
     case 4:
     {
         system("cls");
-        Adminpanel.addStation();
+        Adminpanel.addNewStation();
         break;
     }
     case 5:
     {
         set<int> TrainIds;
-        vector<Train *> trains = Adminpanel.getTrains();
+        vector<Train *> trains = Adminpanel.getAllTrainPointers();
         for (auto &&train : trains)
         {
-            TrainIds.insert(train->getId());
+            TrainIds.insert(train->getTrainId());
         }
         system("cls");
         Adminpanel.viewAllTrains();
@@ -202,10 +205,10 @@ void adminPanel()
     case 6:
     {
         set<int> TrainIds;
-        vector<Train *> trains = Adminpanel.getTrains();
+        vector<Train *> trains = Adminpanel.getAllTrainPointers();
         for (auto &&train : trains)
         {
-            TrainIds.insert(train->getId());
+            TrainIds.insert(train->getTrainId());
         }
         system("cls");
         Adminpanel.viewAllTrains();
@@ -220,7 +223,7 @@ void adminPanel()
         }
         for (int i = 0; i < travelClasses->size(); i++)
         {
-            cout << i + 1 << ". " << travelClasses->at(i).getClassName() << endl;
+            cout << i + 1 << ". " << travelClasses->at(i).getTravelClassName() << endl;
         }
         cout << "Enter the class index to update fare: ";
         int classIndex;
@@ -231,7 +234,7 @@ void adminPanel()
             fflush(stdin);
             cin >> classIndex;
         }
-        string className = travelClasses->at(classIndex - 1).getClassName();
+        string className = travelClasses->at(classIndex - 1).getTravelClassName();
         float newFare;
         cout << "Enter new fare: ";
         cin >> newFare;
@@ -241,10 +244,10 @@ void adminPanel()
     case 7:
     {
         set<int> TrainIds;
-        vector<Train *> trains = Adminpanel.getTrains();
+        vector<Train *> trains = Adminpanel.getAllTrainPointers();
         for (auto &&train : trains)
         {
-            TrainIds.insert(train->getId());
+            TrainIds.insert(train->getTrainId());
         }
         system("cls");
         Adminpanel.viewAllTrains();
@@ -258,7 +261,7 @@ void adminPanel()
         }
         for (int i = 0; i < travelClasses->size(); i++)
         {
-            cout << i + 1 << ". " << travelClasses->at(i).getClassName() << endl;
+            cout << i + 1 << ". " << travelClasses->at(i).getTravelClassName() << endl;
         }
         cout << "Enter the class index to update fare: ";
         int classIndex;
@@ -269,7 +272,7 @@ void adminPanel()
             fflush(stdin);
             cin >> classIndex;
         }
-        string className = travelClasses->at(classIndex - 1).getClassName();
+        string className = travelClasses->at(classIndex - 1).getTravelClassName();
         int newTotalSeats;
         cout << "Enter new total seats: ";
         cin >> newTotalSeats;
@@ -424,8 +427,10 @@ void passengerPanel(Passenger *passenger)
         cin >> day >> month >> year;
         date = Date(day, month, year);
         vector<Train *> availableTrains = passenger->viewAvailability(from, to, date);
-        cout << endl;
-        cout << endl;
+        if (availableTrains.size() == 0)
+        {
+            break;
+        }
         cout << "Select a train by entering its index: ";
         int trainIndex;
         fflush(stdin);
@@ -441,36 +446,36 @@ void passengerPanel(Passenger *passenger)
         cout << "╚════════════════════════════════════════════════════╝" << endl;
 
         int cnt = 1;
-        for (auto &&travelClass : selectedTrain->getClasses())
+        for (auto &&travelClass : selectedTrain->getTravelClasses())
         {
-            cout << cnt++ << ". " << travelClass.getClassName()
+            cout << cnt++ << ". " << travelClass.getTravelClassName()
                  << " | Seats: " << travelClass.getAvailableSeats()
                  << " | Fare: " << travelClass.getFare() << endl;
         }
         cout << "Select a class by entering its index: ";
         int classIndex;
         cin >> classIndex;
-        while (classIndex < 1 || classIndex > selectedTrain->getClasses().size())
+        while (classIndex < 1 || classIndex > selectedTrain->getTravelClasses().size())
         {
             cout << "Invalid class selection. Enter correct index: ";
             cin >> classIndex;
         }
-        TravelClass *selectedClass = &selectedTrain->getClasses()[classIndex - 1];
+        TravelClass *selectedClass = &selectedTrain->getTravelClasses()[classIndex - 1];
         Station *fromStation = Adminpanel.getStationByName(from);
         Station *toStation = Adminpanel.getStationByName(to);
-        passenger->bookTicket(selectedTrain, *fromStation, *toStation, *selectedClass, date);
+        passenger->bookPassengerTicket(selectedTrain, *fromStation, *toStation, *selectedClass, date);
         break;
     }
     case 4:
     {
         system("cls");
-        passenger->cancelTicket();
+        passenger->cancelPassengerTicket();
         break;
     }
     case 5:
     {
         system("cls");
-        passenger->viewMyTickets();
+        passenger->viewPassengerTickets();
         break;
     }
     case 6:
@@ -481,8 +486,9 @@ void passengerPanel(Passenger *passenger)
         cout << "╚══════════════════════════════════════════════╝" << endl;
         string currentPassword;
         cout << "Enter current password: ";
-        cin >> currentPassword;
-        if (currentPassword != passenger->getPassword())
+        // cin >> currentPassword;
+        currentPassword = inputPassword();
+        if (currentPassword != passenger->getPassengerPassword())
         {
             cout << "╔═════════════════════════════════════════╗" << endl;
             cout << "║     Incorrect password. Try again.      ║" << endl;
@@ -495,19 +501,23 @@ void passengerPanel(Passenger *passenger)
         }
         string newPassword;
         cout << "Enter new password: ";
-        cin >> newPassword;
+        // cin >> newPassword;
+        newPassword = inputPassword();
         string confirmPassword;
         cout << "Confirm new password: ";
-        cin >> confirmPassword;
+        // cin >> confirmPassword;
+        confirmPassword = inputPassword();
         while (newPassword != confirmPassword)
         {
             cout << "╔═════════════════════════════════════════════╗" << endl;
             cout << "║        Passwords do not match. Retry.       ║" << endl;
             cout << "╚═════════════════════════════════════════════╝" << endl;
             cout << "Enter new password: ";
-            cin >> newPassword;
+            // cin >> newPassword;
+            newPassword = inputPassword();
             cout << "Confirm new password: ";
-            cin >> confirmPassword;
+            // cin >> confirmPassword;
+            confirmPassword = inputPassword();
         }
         if (passenger->changePassword(newPassword))
         {
