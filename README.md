@@ -29,6 +29,13 @@ This program is a simulation and **does not perform real-life ticket bookings**.
 
 ---
 
+## Pending Feature
+
+- The functionality for **printing tickets in HTML format** is partially implemented.
+- The **function definition and function calls are already present**, but the internal logic to generate and save the HTML ticket is **yet to be written**.
+
+---
+
 ## Concepts Used
 
 - Object-Oriented Programming (OOP)
