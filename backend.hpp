@@ -48,7 +48,7 @@ void saveDataToFile()
             tickets->push_back(ticket);
         }
     }
-    ofstream credentials_file("credentials.csv");
+    ofstream credentials_file("Data/credentials.csv");
     if (!credentials_file.is_open())
     {
         cout << "Error opening credentials file for writing." << endl;
@@ -63,7 +63,7 @@ void saveDataToFile()
     credentials_file.close();
 
     // Save passengers to file
-    ofstream passenger_file("passengers.csv");
+    ofstream passenger_file("Data/passengers.csv");
     passenger_file.clear();
     if (!passenger_file.is_open())
     {
@@ -76,7 +76,7 @@ void saveDataToFile()
     }
     passenger_file.close();
     // Save stations to file
-    ofstream stations_file("stations.csv");
+    ofstream stations_file("Data/stations.csv");
     stations_file.clear();
     if (!stations_file.is_open())
     {
@@ -89,7 +89,7 @@ void saveDataToFile()
     }
     stations_file.close();
     // Save travel classes to file
-    ofstream travel_classes_file("travel_classes.csv");
+    ofstream travel_classes_file("Data/travel_classes.csv");
     travel_classes_file.clear();
     if (!travel_classes_file.is_open())
     {
@@ -104,7 +104,7 @@ void saveDataToFile()
     travel_classes_file.close();
 
     // Save trains to file
-    ofstream trains_file("trains.csv");
+    ofstream trains_file("Data/trains.csv");
     trains_file.clear();
     if (!trains_file.is_open())
     {
@@ -118,7 +118,7 @@ void saveDataToFile()
     trains_file.close();
 
     // Save tickets to file
-    ofstream tickets_file("tickets.csv");
+    ofstream tickets_file("Data/tickets.csv");
     tickets_file.clear();
     if (!tickets_file.is_open())
     {
@@ -141,7 +141,7 @@ void saveDataToFile()
 void loadDataFromFile()
 {
     // Load passengers from file
-    ifstream passengers_file("passengers.csv");
+    ifstream passengers_file("Data/passengers.csv");
     if (!passengers_file.is_open())
     {
         cout << "Error opening passenger information file for reading." << endl;
@@ -177,7 +177,7 @@ void loadDataFromFile()
     passengers_file.close();
 
     // Load credentials from file
-    ifstream credentials_file("credentials.csv");
+    ifstream credentials_file("Data/credentials.csv");
     if (!credentials_file.is_open())
     {
         cout << "Error opening credentials file for reading." << endl;
@@ -200,7 +200,7 @@ void loadDataFromFile()
         }
     }
     // Load stations from file
-    ifstream stations_file("stations.csv");
+    ifstream stations_file("Data/stations.csv");
     if (!stations_file.is_open())
     {
         cout << "Error opening station information file for reading." << endl;
@@ -219,7 +219,7 @@ void loadDataFromFile()
     stations_file.close();
 
     // Load travel classes from file
-    ifstream travel_classes_file("travel_classes.csv");
+    ifstream travel_classes_file("Data/travel_classes.csv");
     if (!travel_classes_file.is_open())
     {
         cout << "Error opening travel class information file for reading." << endl;
@@ -242,7 +242,7 @@ void loadDataFromFile()
     }
     travel_classes_file.close();
     // Load trains from file
-    ifstream trains_file("trains.csv");
+    ifstream trains_file("Data/trains.csv");
     if (!trains_file.is_open())
     {
         cout << "Error opening train information file for reading." << endl;
@@ -288,7 +288,7 @@ void loadDataFromFile()
     }
     trains_file.close();
     // Load tickets from file
-    ifstream tickets_file("tickets.csv");
+    ifstream tickets_file("Data/tickets.csv");
     if (!tickets_file.is_open())
     {
         cout << "Error opening ticket information file for reading." << endl;
