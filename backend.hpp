@@ -1,5 +1,38 @@
-#include "classes.h"
+#include "classes.hpp"
 
+map<char, char> randomMappingOfCharacters;
+
+void generateSymmetricMapping()
+{
+    string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+_";
+    unsigned seed = 37;
+    default_random_engine rng(seed);
+    shuffle(chars.begin(), chars.end(), rng);
+
+    for (int i = 0; i + 1 < chars.size(); i += 2)
+    {
+        char a = chars[i];
+        char b = chars[i + 1];
+        randomMappingOfCharacters[a] = b;
+        randomMappingOfCharacters[b] = a;
+    }
+    if (chars.size() % 2 == 1)
+    {
+        char lastChar = chars.back();
+        randomMappingOfCharacters[lastChar] = lastChar;
+    }
+}
+
+string encrypt_decrypt(string pass)
+{
+    int n = pass.size();
+    string result = "";
+    for (int i = 0; i < n; i++)
+    {
+        result += randomMappingOfCharacters[pass[i]];
+    }
+    return result;
+}
 
 void saveDataToFile()
 {
@@ -25,7 +58,7 @@ void saveDataToFile()
     // Save credentials to file
     for (auto &&passenger : *passengers)
     {
-        credentials_file << passenger.getPassengerUsername() << "," << passenger.getPassengerPassword() << endl;
+        credentials_file << passenger.getPassengerUsername() << "," << encrypt_decrypt(passenger.getPassengerPassword()) << endl;
     }
     credentials_file.close();
 
@@ -156,6 +189,7 @@ void loadDataFromFile()
         string username, password;
         getline(ss, username, ',');
         getline(ss, password);
+        password = encrypt_decrypt(password);
         for (auto &&passenger : *passengers)
         {
             if (passenger.getPassengerUsername() == username)

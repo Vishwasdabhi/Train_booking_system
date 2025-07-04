@@ -1,7 +1,7 @@
-#include "frontend.h"
+#include "frontend.hpp"
 int main()
 {
-    system("color 0A"); 
+    system("color 0A");
     system("chcp 65001");
     system("cls");
     cout << "           o x o x o x o . . ." << endl;
@@ -11,6 +11,7 @@ int main()
     cout << "      _/oo OOOOO oo`  ooo   ooo   o^o       o^o   o^o     o^o" << endl;
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << endl;
     SeedForRandom();
+    generateSymmetricMapping();
     loadDataFromFile();
     fflush(stdin);
     _getch();

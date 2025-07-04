@@ -47,15 +47,17 @@ This program is a simulation and **does not perform real-life ticket bookings**.
 
 ---
 
-##  How to Run
+## How to Run
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Vishwasdabhi/Train_booking_system
    cd Train_booking_system
    ```
 
 2. **Compile the code (Windows only)**
+
    ```bash
    g++ driver.cpp -o train_booking.exe
    ```
@@ -69,15 +71,15 @@ This program is a simulation and **does not perform real-life ticket bookings**.
 
 ---
 
-##  Project Structure
+## Project Structure
 
-| File                | Purpose                                |
-|---------------------|----------------------------------------|
-| `driver.cpp`        | Entry point with UI panels             |
-| `classes.h`    | All core classes (Train, Ticket, etc.) |
-| `backend.h`    | File handling (load/save functions)    |
-| `frontend.h`        | UI-related functions                    |
-| `*.csv`             | Stores persistent data                 |
+| File         | Purpose                                |
+| ------------ | -------------------------------------- |
+| `driver.cpp` | Entry point with UI panels             |
+| `classes.h`  | All core classes (Train, Ticket, etc.) |
+| `backend.h`  | File handling (load/save functions)    |
+| `frontend.h` | UI-related functions                   |
+| `*.csv`      | Stores persistent data                 |
 
 ---
 
@@ -97,13 +99,16 @@ These are automatically loaded/saved using backend functions.
 ## Users
 
 ### Admin
+
 - Can manage trains, stations, fare, seats, and routes.
 
 ### Passenger
+
 - Login with username/password
 - Can book, view, or cancel tickets
 
 ### Guest
+
 - Can explore trains and stations but **cannot book**
 
 ---
@@ -120,10 +125,20 @@ These are automatically loaded/saved using backend functions.
 
 Add terminal screenshots like:
 
-- Admin panel view
-- Passenger booking flow
-- Cancel ticket UI
-- Train availability
+- Enter Screen
+<img src="README_Images/01_Enter_screen.png" alt="Image not found">
+- Login Page
+<img src="README_Images/02_login_page.png" alt="Image not found">
+- Masked input
+<img src="README_Images/03_masked_pass_input.png" alt="Image not found">
+- Admin Panel
+<img src="README_Images/04_Admin_Panel.png" alt="Image not found">
+- User Guest Panel
+<img src="README_Images/05_User_guest_Panel.png" alt="Image not found">
+- Passenger Panel
+<img src="README_Images/06_Passenger_Panel.png" alt="Image not found">
+- Exit Screen
+<img src="README_Images/07_Exit_Screen.png" alt="Image not found">
 
 ---
 
