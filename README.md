@@ -126,19 +126,19 @@ These are automatically loaded/saved using backend functions.
 Add terminal screenshots like:
 
 - Enter Screen
-<img src="README_Images/01_Enter_screen.png" alt="Image not found">
+<img src="Readme_Images/01_Enter_screen.png" alt="Image not found">
 - Login Page
-<img src="README_Images/02_login_page.png" alt="Image not found">
+<img src="Readme_Images/02_login_page.png" alt="Image not found">
 - Masked input
-<img src="README_Images/03_masked_pass_input.png" alt="Image not found">
+<img src="Readme_Images/03_masked_pass_input.png" alt="Image not found">
 - Admin Panel
-<img src="README_Images/04_Admin_Panel.png" alt="Image not found">
+<img src="Readme_Images/04_Admin_Panel.png" alt="Image not found">
 - User Guest Panel
-<img src="README_Images/05_User_guest_Panel.png" alt="Image not found">
+<img src="Readme_Images/05_User_guest_Panel.png" alt="Image not found">
 - Passenger Panel
-<img src="README_Images/06_Passenger_Panel.png" alt="Image not found">
+<img src="Readme_Images/06_Passenger_Panel.png" alt="Image not found">
 - Exit Screen
-<img src="README_Images/07_Exit_Screen.png" alt="Image not found">
+<img src="Readme_Images/07_Exit_Screen.png" alt="Image not found">
 
 ---
 
